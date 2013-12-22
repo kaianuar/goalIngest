@@ -7,32 +7,32 @@ var lodash = require('lodash');
 
 
 
-var earlyBirdWeekly = function(name) {
+var latenighterweekly = function(name) {
   this.name = name;
   return this;
 };
 
-earlyBirdWeekly.prototype = new plugin();
+latenighterweekly.prototype = new plugin();
 
-earlyBirdWeekly.prototype.getRewardKey = function(cb) {
+latenighterweekly.prototype.getRewardKey = function(cb) {
   var now = moment().zone(config.timezone);
   var thisWeek = now.format('YYYY:w');
-  cb(null, 'earlybird:'+thisWeek);
+  cb(null, 'latenight:'+thisWeek);
 }
 
 function createName(mom) {
   var format = 'YYYY-MMM-DD';
-  return 'Early bird reward from ' + moment(mom).startOf('week').format(format) + ' to ' + moment(mom).endOf('week').format(format); 
+  return 'Late night reward from ' + moment(mom).startOf('week').format(format) + ' to ' + moment(mom).endOf('week').format(format); 
 }
 
-earlyBirdWeekly.prototype.getReward = function(key, cb) {
+latenighterweekly.prototype.getReward = function(key, cb) {
   this.connection = mysql.createConnection(config.connection);
 
   connection.connect(function(err) {
     if(err) {
       cb(err);
     } else {
-      mysqlUtils.query(connection, "SELECT id FROM #__rewards WHERE reward_key='" + key+ "'", config.plugins.earlybirdweekly.prefix, function(err, rows) {
+      mysqlUtils.query(connection, "SELECT id FROM #__rewards WHERE reward_key='" + key+ "'", config.plugins.latenighterweekly.prefix, function(err, rows) {
         if(!err){
           if(rows.length) {
             cb(null, rows[0].id);
@@ -41,10 +41,10 @@ earlyBirdWeekly.prototype.getReward = function(key, cb) {
             var insertQuery = lodash.template( "INSERT INTO #__rewards (`name`, `description`, `repeat`, `created_date`, `group`, `reward_key`) VALUES ('<%= name %>', '<%= description %>', 1, NOW(), NULL, '<%= key %>')" );
             insertQuery = insertQuery({
               name: createName(now),
-              description: 'It s nice that you come early in the morning!! Woohooo',
+              description: 'It s nice that you come late at night!! Woohooo',
               key: key
             });
-            mysqlUtils.query(connection, insertQuery, config.plugins.earlybirdweekly.prefix, function(err, row) {
+            mysqlUtils.query(connection, insertQuery, config.plugins.latenighterweekly.prefix, function(err, row) {
               cb(err, row.insertId);
             });
           }
@@ -56,13 +56,13 @@ earlyBirdWeekly.prototype.getReward = function(key, cb) {
   });
 };
 
-earlyBirdWeekly.prototype.getIgnorableUsers = function(row, cb) {
+latenighterweekly.prototype.getIgnorableUsers = function(row, cb) {
   this.reward_id = row;
   // Pass through
   cb(null, null);
 }
 
-earlyBirdWeekly.prototype.getData = function( a, cb ){ 
+latenighterweekly.prototype.getData = function( a, cb ){ 
   var now = moment().zone(config.timezone);
   var startOfWeek = moment(now).startOf('week').toISOString();
   var endOfWeek = moment(now).endOf('week').toISOString();
@@ -73,7 +73,7 @@ earlyBirdWeekly.prototype.getData = function( a, cb ){
   });
 }
 
-earlyBirdWeekly.prototype.processData = function(rows, cb) {
+latenighterweekly.prototype.processData = function(rows, cb) {
 
   var ids = [];
   lodash.each(rows, function(row) {
@@ -81,8 +81,8 @@ earlyBirdWeekly.prototype.processData = function(rows, cb) {
     var dates = row.dates.split(',');
     var times = lodash.reduce(dates, function(result, date) {
       date = moment(date);
-      var referenceMoment = moment(date).hour(8).minutes(0).seconds(0);
-      return (referenceMoment.isAfter(date) ? result+1 : result);
+      var referenceMoment = moment(date).hour(22).minutes(0).seconds(0);
+      return (referenceMoment.isBefore(date) ? result+1 : result);
     },0 );
     ids.push({
       uid: row.UserId,
@@ -92,7 +92,7 @@ earlyBirdWeekly.prototype.processData = function(rows, cb) {
   cb(null, ids);
 }
 
-earlyBirdWeekly.prototype.reward = function(users, cb) {
+latenighterweekly.prototype.reward = function(users, cb) {
   if(users.length) {
     var query = lodash.template('INSERT INTO #__user_rewards (user_id, reward_id, awarded, is_new, progress) VALUES <%= inserts %> ON DUPLICATE KEY UPDATE progress=VALUES(progress)');
     var template = lodash.template('(<%= user %>,'+this.reward_id+',<%= awarded %>,1, <%= progress %>)');
@@ -115,10 +115,10 @@ earlyBirdWeekly.prototype.reward = function(users, cb) {
     query = query({
       inserts:inserts
     });
-    mysqlUtils.query(this.connection, query, config.plugins.earlybirdweekly.prefix, cb);
+    mysqlUtils.query(this.connection, query, config.plugins.latenighterweekly.prefix, cb);
   } else {
     cb(null, 'No reward awarded');
   }
 }
 
-module.exports = earlyBirdWeekly;
+module.exports = latenighterweekly;

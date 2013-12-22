@@ -2,7 +2,8 @@ var async = require('async');
 
 var plugin = module.exports = function() {
   var self = this;
-  this.processReward = function() {
+  this.processReward = function(name) {
+    self.name = name;
     async.waterfall([
       self.getRewardKey,
       self.getReward,

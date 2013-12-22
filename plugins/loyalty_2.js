@@ -15,11 +15,11 @@ var loyaltyPlugin = function(name) {
 loyaltyPlugin.prototype = new plugin();
 
 loyaltyPlugin.prototype.getRewardKey = function(cb) {
-  cb(null, 'loyalty:1year');
+  cb(null, 'loyalty:2year');
 }
 
 loyaltyPlugin.prototype.getReward = function(key, cb) {
-  this.connection = mysql.createConnection(config.plugins.loyalty.connection);
+  this.connection = mysql.createConnection(config.connection);
 
   connection.connect(function(err) {
     if(err) {
@@ -48,7 +48,7 @@ loyaltyPlugin.prototype.getIgnorableUsers = function(row, cb) {
 
 loyaltyPlugin.prototype.getData = function( a, cb ){ 
   console.log(a, cb);
-  mysqlUtils.query(this.connection, 'SELECT users.uid FROM users LEFT JOIN #__user_rewards ON #__user_rewards.user_id=users.uid WHERE #__user_rewards.id IS NULL AND FROM_UNIXTIME(users.created)<DATE_SUB(NOW(), INTERVAL 1 YEAR)', config.plugins.loyalty.prefix, function(err, rows) {
+  mysqlUtils.query(this.connection, 'SELECT users.uid FROM users LEFT JOIN #__user_rewards ON #__user_rewards.user_id=users.uid WHERE #__user_rewards.id IS NULL AND FROM_UNIXTIME(users.created)<DATE_SUB(NOW(), INTERVAL 2 YEAR)', config.plugins.loyalty.prefix, function(err, rows) {
     cb(err, rows);
   });
 }
