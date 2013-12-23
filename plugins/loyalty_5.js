@@ -15,7 +15,7 @@ var loyaltyPlugin = function(name) {
 loyaltyPlugin.prototype = new plugin();
 
 loyaltyPlugin.prototype.getRewardKey = function(cb) {
-  cb(null, 'loyalty:2year');
+  cb(null, 'loyalty:5year');
 }
 
 loyaltyPlugin.prototype.getReward = function(key, cb) {
@@ -25,7 +25,7 @@ loyaltyPlugin.prototype.getReward = function(key, cb) {
     if(err) {
       cb(err);
     } else {
-      mysqlUtils.query(connection, "SELECT id FROM #__rewards WHERE `reward_key`='"+key+"' LIMIT 0,1", config.plugins.loyalty.prefix, function(err, rows) {
+      mysqlUtils.query(connection, "SELECT id FROM #__rewards WHERE `reward_key`='"+key+"' LIMIT 0,1", config.plugins.loyalty_5.prefix, function(err, rows) {
         if(!err){
           if(rows.length) {
             cb(null, rows[0].id);
@@ -48,7 +48,7 @@ loyaltyPlugin.prototype.getIgnorableUsers = function(row, cb) {
 
 loyaltyPlugin.prototype.getData = function( a, cb ){ 
   console.log(a, cb);
-  mysqlUtils.query(this.connection, 'SELECT users.uid FROM users LEFT JOIN #__user_rewards ON #__user_rewards.user_id=users.uid WHERE #__user_rewards.id IS NULL AND FROM_UNIXTIME(users.created)<DATE_SUB(NOW(), INTERVAL 5 YEAR)', config.plugins.loyalty.prefix, function(err, rows) {
+  mysqlUtils.query(this.connection, 'SELECT users.uid FROM users LEFT JOIN #__user_rewards ON #__user_rewards.user_id=users.uid WHERE #__user_rewards.id IS NULL AND FROM_UNIXTIME(users.created)<DATE_SUB(NOW(), INTERVAL 5 YEAR)', config.plugins.loyalty_5.prefix, function(err, rows) {
     cb(err, rows);
   });
 }
@@ -72,7 +72,7 @@ loyaltyPlugin.prototype.reward = function(ids, cb) {
     query = query({
       inserts:inserts
     });
-    mysqlUtils.query(this.connection, query, config.plugins.loyalty.prefix, cb);
+    mysqlUtils.query(this.connection, query, config.plugins.loyalty_5.prefix, cb);
   } else {
     cb(null, 'No reward awarded');
   }
