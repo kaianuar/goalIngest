@@ -94,7 +94,7 @@ latenighterweekly.prototype.processData = function(rows, cb) {
 
 latenighterweekly.prototype.reward = function(users, cb) {
   if(users.length) {
-    var query = lodash.template('INSERT INTO #__user_rewards (user_id, reward_id, awarded, is_new, progress) VALUES <%= inserts %> ON DUPLICATE KEY UPDATE progress=VALUES(progress)');
+    var query = lodash.template('INSERT INTO #__user_rewards (user_id, reward_id, awarded, is_new, progress) VALUES <%= inserts %> ON DUPLICATE KEY UPDATE progress=VALUES(progress), awarded = NOW()');
     var template = lodash.template('(<%= user %>,'+this.reward_id+',<%= awarded %>,1, <%= progress %>)');
     var inserts = lodash.map(users, function(user){
       if(user.times >=3) {
