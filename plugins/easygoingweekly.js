@@ -23,7 +23,7 @@ easygoingweekly.prototype.getRewardKey = function(cb) {
 
 function createName(mom) {
   var format = 'YYYY-MMM-DD';
-  return 'Easy going reward from ' + moment(mom).startOf('week').format(format) + ' to ' + moment(mom).endOf('week').format(format); 
+  return 'Easy going reward from ' + moment(mom).startOf('month').format(format) + ' to ' + moment(mom).endOf('month').format(format); 
 }
 
 easygoingweekly.prototype.getReward = function(key, cb) {
